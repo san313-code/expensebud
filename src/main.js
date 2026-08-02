@@ -99,7 +99,7 @@ function render() {
         <div class="brand">
           <div class="brand-mark">B</div>
           <div>
-            <h1>Budget Tracker</h1>
+            <h1>ExpenseBud</h1>
             <p>Track expenses, set budgets, stay on course.</p>
           </div>
         </div>
