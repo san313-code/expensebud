@@ -59,9 +59,14 @@ async function load() {
     ])
     state.categories = categories
     state.transactions = transactions
-  } catch (err) {
-    state.error = err.message || 'Failed to load data.'
   }
+  catch (err) {
+  state.authPending = false
+  state.authError = err.message || 'Authentication failed.'
+  render()
+  }
+
+
   state.loading = false
   render()
 }
