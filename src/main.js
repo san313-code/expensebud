@@ -24,6 +24,7 @@ import {
   signInWithEmail,
   signOutUser,
   signUpWithEmail,
+  signInWithProvider,
 } from './supabaseClient.js'
 
 const state = {
@@ -204,6 +205,11 @@ function renderAuthScreen(message = 'Sign in to access your budget dashboard.') 
         ${!isForgot ? `<div class="auth-toggle" role="tablist" aria-label="Authentication mode">
           <button class="auth-toggle-btn ${!isSignup ? 'active' : ''}" type="button" id="btn-mode-signin">Sign in</button>
           <button class="auth-toggle-btn ${isSignup ? 'active' : ''}" type="button" id="btn-mode-signup">Create account</button>
+        </div>` : ''}
+        ${!isForgot ? `<div class="oauth-providers" style="margin:12px 0;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" type="button" id="btn-oauth-google">Continue with Google</button>
+          <button class="btn" type="button" id="btn-oauth-github">Continue with GitHub</button>
+          <button class="btn" type="button" id="btn-oauth-linkedin">Continue with LinkedIn</button>
         </div>` : ''}
         <form id="auth-form" class="auth-form">
           <input class="form-control" type="email" name="auth-email" placeholder="Email" value="${escapeHtml(state.authEmail)}" required>
@@ -448,6 +454,42 @@ function attachEvents() {
   })
   document.getElementById('btn-submit-auth')?.addEventListener('click', () => handleAuthSubmit(state.authMode))
   document.getElementById('btn-signout')?.addEventListener('click', () => handleSignOut())
+  document.getElementById('btn-oauth-google')?.addEventListener('click', async () => {
+    try {
+      state.authPending = true
+      state.authError = null
+      render()
+      await signInWithProvider('google')
+    } catch (err) {
+      state.authPending = false
+      state.authError = err.message || 'OAuth sign-in failed.'
+      render()
+    }
+  })
+  document.getElementById('btn-oauth-github')?.addEventListener('click', async () => {
+    try {
+      state.authPending = true
+      state.authError = null
+      render()
+      await signInWithProvider('github')
+    } catch (err) {
+      state.authPending = false
+      state.authError = err.message || 'OAuth sign-in failed.'
+      render()
+    }
+  })
+  document.getElementById('btn-oauth-linkedin')?.addEventListener('click', async () => {
+    try {
+      state.authPending = true
+      state.authError = null
+      render()
+      await signInWithProvider('linkedin')
+    } catch (err) {
+      state.authPending = false
+      state.authError = err.message || 'OAuth sign-in failed.'
+      render()
+    }
+  })
   document.getElementById('prev-month')?.addEventListener('click', () => {
     state.month = shiftMonth(state.month, -1)
     load()
