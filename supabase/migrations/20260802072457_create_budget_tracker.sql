@@ -30,6 +30,7 @@
 
 CREATE TABLE IF NOT EXISTS categories (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
   name text NOT NULL,
   kind text NOT NULL CHECK (kind IN ('income', 'expense')),
   budget_limit numeric(12, 2),
@@ -40,23 +41,24 @@ CREATE TABLE IF NOT EXISTS categories (
 ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "anon_select_categories" ON categories;
-CREATE POLICY "anon_select_categories" ON categories FOR SELECT
-  TO anon, authenticated USING (true);
+CREATE POLICY "select_categories" ON categories FOR SELECT
+  TO authenticated USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "anon_insert_categories" ON categories;
-CREATE POLICY "anon_insert_categories" ON categories FOR INSERT
-  TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "insert_categories" ON categories FOR INSERT
+  TO authenticated WITH CHECK (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "anon_update_categories" ON categories;
-CREATE POLICY "anon_update_categories" ON categories FOR UPDATE
-  TO anon, authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "update_categories" ON categories FOR UPDATE
+  TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "anon_delete_categories" ON categories;
-CREATE POLICY "anon_delete_categories" ON categories FOR DELETE
-  TO anon, authenticated USING (true);
+CREATE POLICY "delete_categories" ON categories FOR DELETE
+  TO authenticated USING (auth.uid() = user_id);
 
 CREATE TABLE IF NOT EXISTS transactions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
   amount numeric(12, 2) NOT NULL CHECK (amount > 0),
   kind text NOT NULL CHECK (kind IN ('income', 'expense')),
   category_id uuid REFERENCES categories(id) ON DELETE SET NULL,
@@ -68,20 +70,20 @@ CREATE TABLE IF NOT EXISTS transactions (
 ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "anon_select_transactions" ON transactions;
-CREATE POLICY "anon_select_transactions" ON transactions FOR SELECT
-  TO anon, authenticated USING (true);
+CREATE POLICY "select_transactions" ON transactions FOR SELECT
+  TO authenticated USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "anon_insert_transactions" ON transactions;
-CREATE POLICY "anon_insert_transactions" ON transactions FOR INSERT
-  TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "insert_transactions" ON transactions FOR INSERT
+  TO authenticated WITH CHECK (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "anon_update_transactions" ON transactions;
-CREATE POLICY "anon_update_transactions" ON transactions FOR UPDATE
-  TO anon, authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "update_transactions" ON transactions FOR UPDATE
+  TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "anon_delete_transactions" ON transactions;
-CREATE POLICY "anon_delete_transactions" ON transactions FOR DELETE
-  TO anon, authenticated USING (true);
+CREATE POLICY "delete_transactions" ON transactions FOR DELETE
+  TO authenticated USING (auth.uid() = user_id);
 
 CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date DESC);
 CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category_id);

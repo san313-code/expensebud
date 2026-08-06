@@ -81,3 +81,13 @@ export async function getCurrentSession() {
   if (error) throw new Error(error.message || JSON.stringify(error))
   return session
 }
+
+export async function getCurrentUserId() {
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser()
+  if (error) throw new Error(error.message || JSON.stringify(error))
+  if (!user?.id) throw new Error('No authenticated user.')
+  return user.id
+}

@@ -1,9 +1,11 @@
-import { supabase } from './supabaseClient.js'
+import { supabase, getCurrentUserId } from './supabaseClient.js'
 
 export async function fetchCategories() {
+  const userId = await getCurrentUserId()
   const { data, error } = await supabase
     .from('categories')
     .select('*')
+    .eq('user_id', userId)
     .order('kind')
     .order('name')
   if (error) throw error
@@ -11,9 +13,10 @@ export async function fetchCategories() {
 }
 
 export async function createCategory(payload) {
+  const userId = await getCurrentUserId()
   const { data, error } = await supabase
     .from('categories')
-    .insert(payload)
+    .insert({ ...payload, user_id: userId })
     .select()
     .single()
   if (error) throw error
@@ -21,10 +24,12 @@ export async function createCategory(payload) {
 }
 
 export async function updateCategory(id, payload) {
+  const userId = await getCurrentUserId()
   const { data, error } = await supabase
     .from('categories')
     .update(payload)
     .eq('id', id)
+    .eq('user_id', userId)
     .select()
     .single()
   if (error) throw error
@@ -32,14 +37,21 @@ export async function updateCategory(id, payload) {
 }
 
 export async function deleteCategory(id) {
-  const { error } = await supabase.from('categories').delete().eq('id', id)
+  const userId = await getCurrentUserId()
+  const { error } = await supabase
+    .from('categories')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', userId)
   if (error) throw error
 }
 
 export async function fetchTransactions({ month } = {}) {
+  const userId = await getCurrentUserId()
   let query = supabase
     .from('transactions')
     .select('*, category:categories(id, name, color, kind)')
+    .eq('user_id', userId)
     .order('date', { ascending: false })
     .order('created_at', { ascending: false })
 
@@ -56,9 +68,10 @@ export async function fetchTransactions({ month } = {}) {
 }
 
 export async function createTransaction(payload) {
+  const userId = await getCurrentUserId()
   const { data, error } = await supabase
     .from('transactions')
-    .insert(payload)
+    .insert({ ...payload, user_id: userId })
     .select('*, category:categories(id, name, color, kind)')
     .single()
   if (error) throw error
@@ -66,10 +79,12 @@ export async function createTransaction(payload) {
 }
 
 export async function updateTransaction(id, payload) {
+  const userId = await getCurrentUserId()
   const { data, error } = await supabase
     .from('transactions')
     .update(payload)
     .eq('id', id)
+    .eq('user_id', userId)
     .select('*, category:categories(id, name, color, kind)')
     .single()
   if (error) throw error
@@ -77,6 +92,11 @@ export async function updateTransaction(id, payload) {
 }
 
 export async function deleteTransaction(id) {
-  const { error } = await supabase.from('transactions').delete().eq('id', id)
+  const userId = await getCurrentUserId()
+  const { error } = await supabase
+    .from('transactions')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', userId)
   if (error) throw error
 }
