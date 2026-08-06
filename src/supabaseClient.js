@@ -8,7 +8,7 @@ if (!url || !anonKey) {
 }
 
 export const supabase = createClient(url || 'https://example.supabase.co', anonKey || 'public-anon-key', {
-  auth: { persistSession: true, autoRefreshToken: true },
+  auth: { persistSession: false },
 })
 
 export async function ensureAuthenticated() {
