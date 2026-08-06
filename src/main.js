@@ -372,7 +372,16 @@ async function handleAuthSubmit(mode) {
 
   try {
     if (mode === 'signup') {
-      await signUpWithEmail(email, password)
+      const signUpResult = await signUpWithEmail(email, password)
+      // If Supabase requires email confirmation, a session may not be returned.
+      if (!signUpResult?.session) {
+        state.authPending = false
+        state.authSuccess = 'Check your inbox to confirm your email address.'
+        state.authError = null
+        render()
+        return
+      }
+      // otherwise continue and load session
     } else {
       await signInWithEmail(email, password)
     }

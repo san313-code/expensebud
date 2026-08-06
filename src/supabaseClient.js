@@ -7,9 +7,13 @@ if (!url || !anonKey) {
   console.warn('Supabase credentials are missing. Set VITE_SUPABASE_URL/VITE_SUPABASE_ANON_KEY or SUPABASE_URL/SUPABASE_PUBLISHABLE_KEY.')
 }
 
-export const supabase = createClient(url || 'https://example.supabase.co', anonKey || 'public-anon-key', {
-  auth: { persistSession: false },
-})
+export const supabase = createClient(
+  url || 'https://example.supabase.co',
+  anonKey || 'public-anon-key',
+  {
+    auth: { persistSession: true, detectSessionInUrl: true },
+  }
+)
 
 export async function ensureAuthenticated() {
   try {
@@ -28,26 +32,27 @@ export async function ensureAuthenticated() {
 
 export async function signInWithEmail(email, password) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) throw error
+  if (error) throw new Error(error.message || JSON.stringify(error))
   return data.session
 }
 
 export async function signUpWithEmail(email, password) {
   const { data, error } = await supabase.auth.signUp({ email, password })
-  if (error) throw error
-  return data.session
+  if (error) throw new Error(error.message || JSON.stringify(error))
+  // Return the full data so callers can handle cases where email confirmation is required
+  return data
 }
 
 export async function resetPassword(email) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: window.location.origin,
   })
-  if (error) throw error
+  if (error) throw new Error(error.message || JSON.stringify(error))
 }
 
 export async function signOutUser() {
   const { error } = await supabase.auth.signOut()
-  if (error) throw error
+  if (error) throw new Error(error.message || JSON.stringify(error))
 }
 
 export async function getCurrentSession() {
@@ -55,6 +60,6 @@ export async function getCurrentSession() {
     data: { session },
     error,
   } = await supabase.auth.getSession()
-  if (error) throw error
+  if (error) throw new Error(error.message || JSON.stringify(error))
   return session
 }
