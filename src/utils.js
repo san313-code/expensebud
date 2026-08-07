@@ -14,13 +14,25 @@ export const CURRENCIES = [
   { code: 'NGN', label: 'Nigerian Naira' },
 ]
 
+const CURRENCY_LOCALES = {
+  USD: 'en-US',
+  EUR: 'en-IE',
+  GBP: 'en-GB',
+  JPY: 'ja-JP',
+  CAD: 'en-CA',
+  AUD: 'en-AU',
+  ZAR: 'en-ZA',
+  NGN: 'en-NG',
+}
+
 export function pickColor(index) {
   return PALETTE[index % PALETTE.length]
 }
 
 export function formatCurrency(value, currency = 'USD') {
   const n = Number(value || 0)
-  return n.toLocaleString('en-US', {
+  const locale = CURRENCY_LOCALES[currency] || 'en-US'
+  return n.toLocaleString(locale, {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,
