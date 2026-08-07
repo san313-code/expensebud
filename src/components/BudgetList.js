@@ -1,6 +1,6 @@
 import { formatCurrency } from '../utils.js'
 
-export function BudgetList({ categories, spentByCategory }) {
+export function BudgetList({ categories, spentByCategory, currency = 'USD' }) {
   const expenseCats = categories.filter((c) => c.kind === 'expense')
 
   if (!expenseCats.length) {
@@ -20,7 +20,7 @@ export function BudgetList({ categories, spentByCategory }) {
                 <span class="budget-swatch" style="background:${cat.color}"></span>
                 ${cat.name}
               </span>
-              <span class="budget-amounts"><span class="spent">${formatCurrency(spent)}</span> spent</span>
+              <span class="budget-amounts"><span class="spent">${formatCurrency(spent, currency)}</span> spent</span>
             </div>
             <div class="budget-bar"><div class="budget-fill" style="width:0%"></div></div>
             <div class="budget-no-limit">No monthly limit set</div>
@@ -33,8 +33,8 @@ export function BudgetList({ categories, spentByCategory }) {
       const near = !over && pct >= 80
       const cls = over ? 'over' : near ? 'near' : 'ok'
       const status = over
-        ? `${formatCurrency(spent - limit)} over budget`
-        : `${formatCurrency(limit - spent)} left`
+        ? `${formatCurrency(spent - limit, currency)} over budget`
+        : `${formatCurrency(limit - spent, currency)} left`
 
       return `
         <div class="budget-item">
@@ -44,7 +44,7 @@ export function BudgetList({ categories, spentByCategory }) {
               ${cat.name}
             </span>
             <span class="budget-amounts">
-              <span class="spent">${formatCurrency(spent)}</span> / ${formatCurrency(limit)}
+              <span class="spent">${formatCurrency(spent, currency)}</span> / ${formatCurrency(limit, currency)}
             </span>
           </div>
           <div class="budget-bar">

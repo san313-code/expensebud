@@ -3,15 +3,26 @@ export const PALETTE = [
   '#8b5cf6', '#f97316', '#14b8a6', '#6366f1', '#84cc16',
 ]
 
+export const CURRENCIES = [
+  { code: 'USD', label: 'US Dollar' },
+  { code: 'EUR', label: 'Euro' },
+  { code: 'GBP', label: 'British Pound' },
+  { code: 'JPY', label: 'Japanese Yen' },
+  { code: 'CAD', label: 'Canadian Dollar' },
+  { code: 'AUD', label: 'Australian Dollar' },
+  { code: 'ZAR', label: 'South African Rand' },
+  { code: 'NGN', label: 'Nigerian Naira' },
+]
+
 export function pickColor(index) {
   return PALETTE[index % PALETTE.length]
 }
 
-export function formatCurrency(value) {
+export function formatCurrency(value, currency = 'USD') {
   const n = Number(value || 0)
   return n.toLocaleString('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency,
     minimumFractionDigits: 2,
   })
 }

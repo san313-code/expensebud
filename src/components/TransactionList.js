@@ -1,6 +1,6 @@
 import { formatCurrency, formatDate } from '../utils.js'
 
-export function TransactionList({ transactions, onEdit, onDelete }) {
+export function TransactionList({ transactions, onEdit, onDelete, currency = 'USD' }) {
   if (!transactions.length) {
     return `
       <div class="empty-state">
@@ -24,7 +24,7 @@ export function TransactionList({ transactions, onEdit, onDelete }) {
         </div>
         <div class="tx-date">${formatDate(tx.date)}</div>
         <div class="tx-amount ${tx.kind}">
-          ${tx.kind === 'income' ? '+' : '−'}${formatCurrency(tx.amount)}
+          ${tx.kind === 'income' ? '+' : '−'}${formatCurrency(tx.amount, currency)}
         </div>
         <div class="tx-actions">
           <button class="btn btn-ghost btn-sm" data-action="edit" data-id="${tx.id}" title="Edit">✎</button>

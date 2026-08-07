@@ -1,4 +1,4 @@
-export function CategoryManager({ categories, onEdit, onDelete }) {
+export function CategoryManager({ categories, onEdit, onDelete, currency = 'USD' }) {
   const expenseCats = categories.filter((c) => c.kind === 'expense')
   const incomeCats = categories.filter((c) => c.kind === 'income')
 
@@ -9,7 +9,7 @@ export function CategoryManager({ categories, onEdit, onDelete }) {
         <li class="cat-item" data-id="${c.id}">
           <span class="cat-swatch" style="background:${c.color}"></span>
           <span class="cat-name">${c.name}</span>
-          ${c.budget_limit ? `<span class="cat-budget">${Number(c.budget_limit).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}/mo</span>` : ''}
+          ${c.budget_limit ? `<span class="cat-budget">${formatCurrency(Number(c.budget_limit), currency)}/mo</span>` : ''}
           <span class="cat-kind ${c.kind}">${c.kind}</span>
           <button class="btn btn-ghost btn-sm" data-action="edit-cat" data-id="${c.id}">✎</button>
           <button class="btn btn-ghost btn-sm btn-danger" data-action="del-cat" data-id="${c.id}">🗑</button>

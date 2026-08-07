@@ -1,6 +1,6 @@
 import { formatCurrency } from '../utils.js'
 
-export function DonutChart({ data, total, label }) {
+export function DonutChart({ data, total, label, currency = 'USD' }) {
   const size = 140
   const stroke = 22
   const radius = (size - stroke) / 2
@@ -35,7 +35,7 @@ export function DonutChart({ data, total, label }) {
       <div class="legend-item">
         <span class="legend-dot" style="background:${item.color}"></span>
         <span class="legend-name">${item.name}</span>
-        <span class="legend-val">${formatCurrency(item.value)}</span>
+        <span class="legend-val">${formatCurrency(item.value, currency)}</span>
       </div>
     `
     )
@@ -50,7 +50,7 @@ export function DonutChart({ data, total, label }) {
           ${segments.join('')}
         </svg>
         <div class="donut-center">
-          <div class="total">${formatCurrency(total)}</div>
+          <div class="total">${formatCurrency(total, currency)}</div>
           <div class="label">${label}</div>
         </div>
       </div>

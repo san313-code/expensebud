@@ -9,7 +9,7 @@ import {
   updateCategory,
   deleteCategory,
 } from './api.js'
-import { formatCurrency, monthKey, monthLabel, shiftMonth } from './utils.js'
+import { formatCurrency, monthKey, monthLabel, shiftMonth, CURRENCIES } from './utils.js'
 import { Toast } from './components/Toast.js'
 import { DonutChart } from './components/DonutChart.js'
 import { TransactionList } from './components/TransactionList.js'
@@ -43,6 +43,7 @@ const state = {
   authSuccess: null,
   authView: 'signin',
   theme: localStorage.getItem('expensebud-theme') || 'light',
+  currency: localStorage.getItem('expensebud-currency') || 'USD',
 }
 
 const app = document.querySelector('#app')
@@ -151,6 +152,11 @@ function render() {
   }
 
   const summary = computeSummary()
+  const currencyOptions = CURRENCIES.map((currency) => `
+            <option value="${currency.code}" ${state.currency === currency.code ? 'selected' : ''}>
+              ${currency.code} — ${currency.label}
+            </option>
+          `).join('')
 
   app.innerHTML = `
     <div class="app">
@@ -163,6 +169,10 @@ function render() {
           </div>
         </div>
         <div class="header-actions">
+          <div class="currency-select-wrap">
+            <label for="currency-select">Currency</label>
+            <select id="currency-select" class="currency-select">${currencyOptions}</select>
+          </div>
           <button class="theme-toggle" id="btn-theme-toggle" type="button" aria-label="Toggle theme">
             <span class="theme-toggle-icon">${state.theme === 'dark' ? '☀️' : '🌙'}</span>
             <span>${state.theme === 'dark' ? 'Light' : 'Dark'}</span>
@@ -286,19 +296,19 @@ function renderDashboard(summary) {
       <div class="summary-card income">
         <div class="accent-bar"></div>
         <div class="label">↑ Income</div>
-        <div class="value">${formatCurrency(income)}</div>
+        <div class="value">${formatCurrency(income, state.currency)}</div>
         <div class="sub">This month</div>
       </div>
       <div class="summary-card expense">
         <div class="accent-bar"></div>
         <div class="label">↓ Expenses</div>
-        <div class="value">${formatCurrency(expense)}</div>
+        <div class="value">${formatCurrency(expense, state.currency)}</div>
         <div class="sub">This month</div>
       </div>
       <div class="summary-card balance">
         <div class="accent-bar"></div>
         <div class="label">= Balance</div>
-        <div class="value">${formatCurrency(balance)}</div>
+        <div class="value">${formatCurrency(balance, state.currency)}</div>
         <div class="sub">${balance >= 0 ? 'In the green' : 'Over budget'}</div>
       </div>
     </div>
@@ -315,7 +325,7 @@ function renderDashboardBody(summary) {
         </div>
         <div class="card-body">
           <div class="tx-scroll">
-            ${TransactionList({ transactions: state.transactions })}
+            ${TransactionList({ transactions: state.transactions, currency: state.currency })}
           </div>
         </div>
       </div>
@@ -323,13 +333,13 @@ function renderDashboardBody(summary) {
         <div class="card">
           <div class="card-header"><h2>Spending breakdown</h2></div>
           <div class="card-body">
-            ${DonutChart({ data: summary.donutData, total: summary.expense, label: 'spent' })}
+            ${DonutChart({ data: summary.donutData, total: summary.expense, label: 'spent', currency: state.currency })}
           </div>
         </div>
         <div class="card">
           <div class="card-header"><h2>Budgets</h2></div>
           <div class="card-body">
-            ${BudgetList({ categories: state.categories, spentByCategory: summary.spentByCategory })}
+            ${BudgetList({ categories: state.categories, spentByCategory: summary.spentByCategory, currency: state.currency })}
           </div>
         </div>
       </div>
@@ -345,7 +355,7 @@ function renderCategoriesView() {
         <button class="btn btn-primary btn-sm" id="btn-add-cat">+ Add category</button>
       </div>
       <div class="card-body">
-        ${CategoryManager({ categories: state.categories })}
+        ${CategoryManager({ categories: state.categories, currency: state.currency })}
       </div>
     </div>
   `
@@ -455,6 +465,11 @@ function attachEvents() {
     attachEvents()
   })
   document.getElementById('btn-add-cat')?.addEventListener('click', () => openCatModal())
+  document.getElementById('currency-select')?.addEventListener('change', (event) => {
+    state.currency = event.target.value
+    localStorage.setItem('expensebud-currency', state.currency)
+    render()
+  })
   document.getElementById('btn-theme-toggle')?.addEventListener('click', toggleTheme)
   document.getElementById('btn-mode-signin')?.addEventListener('click', () => {
     state.authMode = 'signin'
