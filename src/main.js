@@ -24,7 +24,6 @@ import {
   signInWithEmail,
   signOutUser,
   signUpWithEmail,
-  signInWithProvider,
 } from './supabaseClient.js'
 
 const state = {
@@ -215,35 +214,6 @@ function renderAuthScreen(message = 'Sign in to access your budget dashboard.') 
         ${!isForgot ? `<div class="auth-toggle" role="tablist" aria-label="Authentication mode">
           <button class="auth-toggle-btn ${!isSignup ? 'active' : ''}" type="button" id="btn-mode-signin">Sign in</button>
           <button class="auth-toggle-btn ${isSignup ? 'active' : ''}" type="button" id="btn-mode-signup">Create account</button>
-        </div>` : ''}
-        ${!isForgot ? `<div class="oauth-providers">
-          <button class="btn btn-oauth btn-oauth-google" type="button" id="btn-oauth-google">
-            <span class="icon"> 
-              <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path fill="#EA4335" d="M24 9.5c3.8 0 6.5 1.6 8 2.9l6-6C34.8 3 29.9 1 24 1 14.9 1 7.2 6.3 3.6 13.8l7.4 5.7C12.9 14.1 18 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-2.7-.4-3.9H24v7.2h12.6c-.5 3-2.7 6-6.6 7.9l6 4.7C43.8 38 46.5 31.9 46.5 24.5z"/>
-                <path fill="#FBBC05" d="M11 28.6c-.6-1.8-1-3.7-1-5.6 0-1.9.4-3.8 1-5.6L3.6 12C2 15.6 1 19.6 1 24s1 8.4 2.6 12l7.4-7.4z"/>
-                <path fill="#34A853" d="M24 46c6.1 0 11.2-2 15-5.4l-7.2-5.6c-2 1.3-4.6 2.2-7.8 2.2-6 0-11.1-4.6-12-10.6L3.6 29C7.2 36.7 14.9 42 24 42z"/>
-              </svg>
-            </span>
-            <span class="label">Continue with Google</span>
-          </button>
-          <button class="btn btn-oauth btn-oauth-github" type="button" id="btn-oauth-github">
-            <span class="icon">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path fill="currentColor" d="M12 .5C5.7.5.8 5.4.8 11.8c0 5 3.3 9.3 7.9 10.8.6.1.8-.2.8-.6v-2.1c-3.2.7-3.9-1.4-3.9-1.4-.5-1.2-1.2-1.5-1.2-1.5-1-.7.1-.7.1-.7 1.1.1 1.6 1.2 1.6 1.2 1 .1 1.7.7 2.1 1.1.1-.8.4-1.4.7-1.7-2.6-.3-5.2-1.3-5.2-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.3 0 0 1-.3 3.3 1.2.9-.3 1.9-.5 2.9-.5s2 .2 2.9.5c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 3 .1 3.3.8.8 1.2 1.9 1.2 3.2 0 4.6-2.6 5.6-5.2 5.9.4.3.8 1 .8 2v3c0 .4.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.8C23.2 5.4 18.3.5 12 .5z"/>
-              </svg>
-            </span>
-            <span class="label">Continue with GitHub</span>
-          </button>
-          <button class="btn btn-oauth btn-oauth-linkedin" type="button" id="btn-oauth-linkedin">
-            <span class="icon">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path fill="#0A66C2" d="M20.447 20.452H17.2v-5.569c0-1.328-.027-3.036-1.852-3.036-1.853 0-2.136 1.447-2.136 2.941v5.664H9.068V9h3.102v1.561h.044c.432-.818 1.488-1.681 3.061-1.681 3.273 0 3.877 2.156 3.877 4.96v6.612zM5.337 7.433c-.99 0-1.793-.804-1.793-1.793 0-.989.803-1.792 1.793-1.792.99 0 1.793.803 1.793 1.792 0 .989-.803 1.793-1.793 1.793zM6.946 20.452H3.727V9h3.219v11.452z"/>
-              </svg>
-            </span>
-            <span class="label">Continue with LinkedIn</span>
-          </button>
         </div>` : ''}
         <form id="auth-form" class="auth-form">
           <input class="form-control" type="email" name="auth-email" placeholder="Email" value="${escapeHtml(state.authEmail)}" required>
@@ -493,42 +463,6 @@ function attachEvents() {
   })
   document.getElementById('btn-submit-auth')?.addEventListener('click', () => handleAuthSubmit(state.authMode))
   document.getElementById('btn-signout')?.addEventListener('click', () => handleSignOut())
-  document.getElementById('btn-oauth-google')?.addEventListener('click', async () => {
-    try {
-      state.authPending = true
-      state.authError = null
-      render()
-      await signInWithProvider('google')
-    } catch (err) {
-      state.authPending = false
-      state.authError = err.message || 'OAuth sign-in failed.'
-      render()
-    }
-  })
-  document.getElementById('btn-oauth-github')?.addEventListener('click', async () => {
-    try {
-      state.authPending = true
-      state.authError = null
-      render()
-      await signInWithProvider('github')
-    } catch (err) {
-      state.authPending = false
-      state.authError = err.message || 'OAuth sign-in failed.'
-      render()
-    }
-  })
-  document.getElementById('btn-oauth-linkedin')?.addEventListener('click', async () => {
-    try {
-      state.authPending = true
-      state.authError = null
-      render()
-      await signInWithProvider('linkedin')
-    } catch (err) {
-      state.authPending = false
-      state.authError = err.message || 'OAuth sign-in failed.'
-      render()
-    }
-  })
   document.getElementById('prev-month')?.addEventListener('click', () => {
     state.month = shiftMonth(state.month, -1)
     load()
