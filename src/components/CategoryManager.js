@@ -1,3 +1,5 @@
+import { formatCurrency } from '../utils.js'
+
 export function CategoryManager({ categories, onEdit, onDelete, currency = 'USD' }) {
   const expenseCats = categories.filter((c) => c.kind === 'expense')
   const incomeCats = categories.filter((c) => c.kind === 'income')
