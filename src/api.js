@@ -13,10 +13,10 @@ export async function fetchCategories() {
 }
 
 export async function createCategory(payload) {
-  const userId = await getCurrentUserId()
+  const user = (await supabase.auth.getUser()).data.user
   const { data, error } = await supabase
     .from('categories')
-    .insert({ ...payload, user_id: userId })
+    .insert({ ...payload, user_id: user.id })
     .select()
     .single()
   if (error) throw error
