@@ -50,10 +50,19 @@ export async function signInWithProvider(provider) {
   }
 }
 
-export async function signUpWithEmail(email, password) {
+export async function signUpWithEmail(name, email, password) {
   // Request that Supabase include a redirect back to the app in the confirmation email
   const { data, error } = await supabase.auth.signUp(
-    { email, password },
+    {
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          name,
+        },
+      },
+    },
     { redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined }
   )
   if (error) throw new Error(error.message || JSON.stringify(error))

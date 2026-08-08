@@ -37,6 +37,7 @@ const state = {
   authMode: 'signin',
   authEmail: '',
   authPassword: '',
+  authName: '',
   authPending: false,
   authError: null,
   authSuccess: null,
@@ -216,6 +217,7 @@ function renderAuthScreen(message = 'Sign in to access your budget dashboard.') 
           <button class="auth-toggle-btn ${isSignup ? 'active' : ''}" type="button" id="btn-mode-signup">Create account</button>
         </div>` : ''}
         <form id="auth-form" class="auth-form">
+          ${!isForgot && isSignup ? `<input class="form-control" type="text" name="auth-name" placeholder="Name" value="${escapeHtml(state.authName)}" required>` : ''}
           <input class="form-control" type="email" name="auth-email" placeholder="Email" value="${escapeHtml(state.authEmail)}" required>
           ${!isForgot ? `<input class="form-control" type="password" name="auth-password" placeholder="Password" value="${escapeHtml(state.authPassword)}" required>` : ''}
           <div class="auth-actions">
@@ -235,10 +237,9 @@ function renderAuthCard() {
   const session = state.authSession
 
   if (session?.user) {
-    const email = session.user.email || 'your account'
-    const initials = email
-      .split('@')[0]
-      .split(/[^a-zA-Z0-9]+/)
+    const profileName = session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email || 'your account'
+    const initials = profileName
+      .split(/\s+/)
       .filter(Boolean)
       .slice(0, 2)
       .map((part) => part[0]?.toUpperCase() || '')
@@ -248,7 +249,7 @@ function renderAuthCard() {
       <div class="profile-pill" id="profile-pill">
         <div class="profile-avatar">${escapeHtml(initials)}</div>
         <div class="profile-meta">
-          <div class="profile-name">${escapeHtml(email)}</div>
+          <div class="profile-name">${escapeHtml(profileName)}</div>
           <div class="profile-role">Signed in</div>
         </div>
         <button class="profile-action" id="btn-signout" type="button">Sign out</button>
@@ -336,9 +337,17 @@ async function handleAuthSubmit(mode) {
   if (!form) return
 
   const emailInput = form.querySelector('[name="auth-email"]')
+  const nameInput = form.querySelector('[name="auth-name"]')
   const passwordInput = form.querySelector('[name="auth-password"]')
+  const name = nameInput?.value?.trim() || ''
   const email = emailInput?.value?.trim() || ''
   const password = passwordInput?.value || ''
+
+  if (mode === 'signup' && !name) {
+    state.authError = 'Please enter your name.'
+    render()
+    return
+  }
 
   if (!email) {
     state.authError = 'Please enter your email address.'
@@ -382,7 +391,7 @@ async function handleAuthSubmit(mode) {
 
   try {
     if (mode === 'signup') {
-      const signUpResult = await signUpWithEmail(email, password)
+      const signUpResult = await signUpWithEmail(name, email, password)
       // If Supabase requires email confirmation, a session may not be returned.
       if (!signUpResult?.session) {
         state.authPending = false
@@ -398,6 +407,7 @@ async function handleAuthSubmit(mode) {
     state.authSession = await getCurrentSession()
     state.authEmail = ''
     state.authPassword = ''
+    state.authName = ''
     state.authPending = false
     state.authError = null
     state.authSuccess = null
