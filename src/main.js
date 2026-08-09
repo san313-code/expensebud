@@ -54,6 +54,12 @@ async function load() {
   render()
   try {
     state.authSession = await getCurrentSession()
+    if (!state.authSession?.user) {
+      state.loading = false
+      render()
+      return
+    }
+
     await ensureAuthenticated()
     const [categories, transactions] = await Promise.all([
       fetchCategories(),
@@ -61,13 +67,13 @@ async function load() {
     ])
     state.categories = categories
     state.transactions = transactions
+  } catch (err) {
+    if (state.authSession?.user) {
+      state.authPending = false
+      state.authError = err.message || 'Authentication failed.'
+    }
+    render()
   }
-  catch (err) {
-  state.authPending = false
-  state.authError = err.message || 'Authentication failed.'
-  render()
-  }
-
 
   state.loading = false
   render()
