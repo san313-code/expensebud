@@ -40,6 +40,7 @@ ExpenseBud helps students:
 - Light/Dark theme toggle
 
 ---
+# Link: https://expensebud.vercel.app/
 
 ## 🚀 Getting Started
 
@@ -65,7 +66,9 @@ npm run dev
 This project was born from the Njilo Mentorship Program, where students were encouraged to prepare for the future.  
 With guidance from Planet09AI, I applied my learning to solve a real student problem: managing allowances wisely.
 
-# Link: https://expensebud.vercel.app/
+
 
 
 [Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/san313-code/expensebud)
+
+
