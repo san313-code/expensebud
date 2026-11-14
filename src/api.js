@@ -1,4 +1,5 @@
 import { supabase, getCurrentUserId } from './supabaseClient.js'
+import { shiftMonth } from './utils.js'
 
 export async function fetchCategories() {
   const userId = await getCurrentUserId()
@@ -56,10 +57,9 @@ export async function fetchTransactions({ month } = {}) {
     .order('created_at', { ascending: false })
 
   if (month) {
-    const [year, m] = month.split('-')
-    const start = `${year}-${m}-01`
-    const end = `${year}-${m}-31`
-    query = query.gte('date', start).lte('date', end)
+    const start = `${month}-01`
+    const end = `${shiftMonth(month, 1)}-01`
+    query = query.gte('date', start).lt('date', end)
   }
 
   const { data, error } = await query
