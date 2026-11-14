@@ -35,7 +35,6 @@ export function formatCurrency(value, currency = 'USD') {
   return n.toLocaleString(locale, {
     style: 'currency',
     currency,
-    minimumFractionDigits: 2,
   })
 }
 
